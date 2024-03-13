@@ -2,6 +2,8 @@
 
 Creating a multiple selections drop-down menu in a Google Sheet cell without using external integrations is a challenge because Google Sheets does not natively support multi-select dropdowns. However, you can simulate this functionality by using Google Apps Script to create a custom sidebar or dialog that allows multiple selections, which are then concatenated into a single cell. Here's an example approach using a custom sidebar with checkboxes:
 
+# A single column multiple select drop down:
+
 ## Step 1: Create the Google Apps Script and HTML file:"
 
 Create a new script file in the Apps Script editor:
