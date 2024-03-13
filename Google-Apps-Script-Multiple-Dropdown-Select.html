@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <div id="checkboxes"></div>
+    <button onclick="submit()">Submit</button>
+    
+    <script>
+      // Load items from the server-side function getItems
+      google.script.run.withSuccessHandler(function(items) {
+        var container = document.getElementById('checkboxes');
+        items.forEach(function(item) {
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = item;
+          checkbox.value = item;
+          
+          var label = document.createElement('label');
+          label.htmlFor = item;
+          label.appendChild(document.createTextNode(item));
+          
+          container.appendChild(checkbox);
+          container.appendChild(label);
+          container.appendChild(document.createElement('br'));
+        });
+      }).getItems();
+      
+      function submit() {
+        var selectedItems = [];
+        var checkboxes = document.getElementById('checkboxes').querySelectorAll('input[type=checkbox]:checked');
+        checkboxes.forEach(function(checkbox) {
+          selectedItems.push(checkbox.value);
+        });
+        
+        // Write the selected items back to the sheet
+        google.script.run.writeToSheet(selectedItems);
+        
+        // Optionally close the sidebar
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
