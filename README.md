@@ -12,6 +12,38 @@ Create a new script file in the Apps Script editor:
 
 This is the file Google-Apps-Script-Multiple-Dropdown-Select.js
 
+```
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Custom Tools')
+      .addItem('Multi-Select Dropdown', 'showSidebar')
+      .addToUi();
+}
+
+function showSidebar() {
+  var html = HtmlService.createHtmlOutputFromFile('Page')
+      .setTitle('Multi-Select Dropdown')
+      .setWidth(300);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+function getItems() {
+  // Replace 'Data' with the name of your sheet and adjust range accordingly
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Data');
+  var range = sheet.getRange("A1:A"); // Assuming your items are in column A
+  var values = range.getValues();
+  var items = values.flat().filter(String); // Remove empty strings
+  return items;
+}
+
+function writeToSheet(selectedItems) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var cell = sheet.getActiveCell();
+  cell.setValue(selectedItems.join(", ")); // Join array items with comma and space
+}
+
+```
+
 Please note you will need to change 
 
 ```
@@ -26,6 +58,53 @@ Create a new HTML file in the Apps Script editor:
 2. Name it Page.
 3. Paste in the following HTML and JavaScript:
 
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <div id="checkboxes"></div>
+    <button onclick="submit()">Submit</button>
+    
+    <script>
+      // Load items from the server-side function getItems
+      google.script.run.withSuccessHandler(function(items) {
+        var container = document.getElementById('checkboxes');
+        items.forEach(function(item) {
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = item;
+          checkbox.value = item;
+          
+          var label = document.createElement('label');
+          label.htmlFor = item;
+          label.appendChild(document.createTextNode(item));
+          
+          container.appendChild(checkbox);
+          container.appendChild(label);
+          container.appendChild(document.createElement('br'));
+        });
+      }).getItems();
+      
+      function submit() {
+        var selectedItems = [];
+        var checkboxes = document.getElementById('checkboxes').querySelectorAll('input[type=checkbox]:checked');
+        checkboxes.forEach(function(checkbox) {
+          selectedItems.push(checkbox.value);
+        });
+        
+        // Write the selected items back to the sheet
+        google.script.run.writeToSheet(selectedItems);
+        
+        // Optionally close the sidebar
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>
+```
 This is the file Google-Apps-Script-Multiple-Dropdown-Select.html
 
 
